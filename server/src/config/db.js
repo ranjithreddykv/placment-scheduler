@@ -15,6 +15,13 @@ let memoryServer = null;
 export async function connectDB() {
   let uri = process.env.MONGODB_URI;
 
+  if (!uri && process.env.VERCEL) {
+    throw new Error(
+      '[db] MONGODB_URI is not set. Add it in the Vercel project\'s Environment Variables — ' +
+      'the in-memory MongoDB fallback cannot run in a serverless environment.'
+    );
+  }
+
   if (!uri) {
     const { MongoMemoryReplSet } = await import('mongodb-memory-server');
     memoryServer = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
